@@ -1,4 +1,3 @@
-// STUB by A: Person B overwrites this file
 import '../models/task.dart';
 import '../models/team_member.dart';
 
