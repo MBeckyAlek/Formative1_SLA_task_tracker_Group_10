@@ -21,7 +21,7 @@ class Task {
     required this.createdAt,
   });
 
-  Map<String, dynamic> toJSOn() => {
+  Map<String, dynamic> toJson() => {
     'id': id,
     'title': title,
     'description': description,
