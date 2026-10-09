@@ -91,7 +91,7 @@ class TaskCard extends StatelessWidget {
       children: [
         // The assignee can be null if that member was deleted.
         if (assignee != null)
-          MemberAvatar(name: assignee.name, radius: 14)
+          MemberAvatar(member: assignee, radius: 14)
         else
           const CircleAvatar(
             radius: 14,
