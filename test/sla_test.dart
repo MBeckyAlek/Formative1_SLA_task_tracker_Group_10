@@ -68,6 +68,13 @@ void main() {
           deadline: DateTime(2026, 10, 14), priority: Priority.high);
       expect(SlaService.compute(t, now: now), SlaStatus.atRisk);
     });
+
+    test('boundary: exactly 72 hours left is At Risk', () {
+      final lateNow = DateTime(2026, 10, 12, 23, 59, 59);
+      final t = makeTask(
+          deadline: DateTime(2026, 10, 15), priority: Priority.high);
+      expect(SlaService.compute(t, now: lateNow), SlaStatus.atRisk);
+    });
   });
 
   group('On Track', () {
@@ -88,6 +95,13 @@ void main() {
     test('medium priority, not started, due in 2 days is On Track', () {
       final t = makeTask(deadline: DateTime(2026, 10, 14));
       expect(SlaService.compute(t, now: now), SlaStatus.onTrack);
+    });
+
+    test('boundary:1 sec over 72 hours is On Track', () {
+      final earlyNow = DateTime(2026, 10, 12, 23, 59, 58);
+      final t = makeTask(
+          deadline: DateTime(2026, 10, 15), priority: Priority.high);
+      expect(SlaService.compute(t, now: earlyNow), SlaStatus.onTrack);
     });
   });
 }
