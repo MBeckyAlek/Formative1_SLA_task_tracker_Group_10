@@ -1,4 +1,3 @@
-// STUB by A: Person C overwrites this file
 import 'package:flutter/material.dart';
 import '../models/enums.dart';
 import '../models/task.dart';
