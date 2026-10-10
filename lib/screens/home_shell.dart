@@ -6,6 +6,7 @@ import '../models/task.dart';
 import '../models/team_member.dart';
 import '../services/seed_data.dart';
 import '../services/storage_service.dart';
+import '../widgets/empty_state.dart';
 import 'dashboard_screen.dart';
 import 'profile_screen.dart';
 import 'task_list_screen.dart';
@@ -65,6 +66,11 @@ class _HomeShellState extends State<HomeShell> {
       setState(() => _loading = false);
       _showMessage('Could not load saved data.');
     }
+  }
+
+  Future<void> _retry() async {
+    setState(() => _loading = true);
+    await _load();
   }
 
   void _showMessage(String text) {
@@ -189,8 +195,19 @@ class _HomeShellState extends State<HomeShell> {
   @override
   Widget build(BuildContext context) {
     final user = currentUser;
-    if (_loading || user == null) {
+
+    if (_loading) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+    if (user == null) {
+      return Scaffold(
+        body: EmptyState(
+          icon: Icons.error_outline,
+          message: 'Could not load your data.',
+          buttonLabel: 'Retry',
+          onButtonPressed: _retry,
+        ),
+      );
     }
 
     final listTasks = _memberFilterId == null
