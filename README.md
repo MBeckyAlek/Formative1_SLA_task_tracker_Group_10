@@ -142,6 +142,11 @@ flutter analyze
 flutter test
 ```
 
+## Project report and demo
+
+- [Group 10 Formative 1 report (PDF)](docs/Group10_Formative1_Report.pdf)
+- [Watch the Group 10 demo video](https://youtu.be/Lll020CfW58)
+
 ## Team
 
 | Member             | Role | Main contributions |
