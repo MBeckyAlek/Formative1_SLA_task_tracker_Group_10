@@ -17,6 +17,7 @@ class TaskListScreen extends StatefulWidget {
     required this.tasks,
     required this.members,
     this.initialFilter,
+    this.initialAssigneeId,
     required this.onOpenTask,
     required this.onDeleteTask,
   });
@@ -26,6 +27,9 @@ class TaskListScreen extends StatefulWidget {
 
   /// Status filter is selected when the screen opens. The Dashboard sets it when a status card is tapped
   final SlaStatus? initialFilter;
+
+  /// Only show tasks of this member. The Team screen sets it when a member is tapped
+  final String? initialAssigneeId;
 
   final void Function(Task task) onOpenTask;
   final void Function(Task task) onDeleteTask;
@@ -37,21 +41,25 @@ class TaskListScreen extends StatefulWidget {
 class _TaskListScreenState extends State<TaskListScreen> {
   final TextEditingController _searchController = TextEditingController();
 
-  // The two things the user can change on this screen
+  // three things the user can change on this screen
   String _searchText = '';
   SlaStatus? _selectedStatus; // null = All
+  String? _selectedAssigneeId; // null = everyone
 
   @override
   void initState() {
     super.initState();
     _selectedStatus = widget.initialFilter;
+    _selectedAssigneeId = widget.initialAssigneeId;
   }
 
   @override
   void didUpdateWidget(TaskListScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.initialFilter != oldWidget.initialFilter) {
+    if (widget.initialFilter != oldWidget.initialFilter ||
+        widget.initialAssigneeId != oldWidget.initialAssigneeId) {
       _selectedStatus = widget.initialFilter;
+      _selectedAssigneeId = widget.initialAssigneeId;
     }
   }
 
@@ -63,7 +71,7 @@ class _TaskListScreenState extends State<TaskListScreen> {
   }
 
   // Filtering and sorting
-  /// Applies the search text and the status filter, then sorts
+  /// Applies the search text, the status filter and the assignee filter, then sorts
   List<Task> _getVisibleTasks() {
     final query = _searchText.trim().toLowerCase();
 
@@ -71,7 +79,9 @@ class _TaskListScreenState extends State<TaskListScreen> {
       final matchesSearch = task.title.toLowerCase().contains(query);
       final matchesStatus =
           _selectedStatus == null || SlaService.compute(task) == _selectedStatus;
-      return matchesSearch && matchesStatus;
+      final matchesAssignee =
+          _selectedAssigneeId == null || task.assigneeId == _selectedAssigneeId;
+      return matchesSearch && matchesStatus && matchesAssignee;
     }).toList();
 
     result.sort(_compareTasks);
@@ -108,6 +118,7 @@ class _TaskListScreenState extends State<TaskListScreen> {
         children: [
           _buildSearchField(),
           _buildFilterChips(),
+          if (_selectedAssigneeId != null) _buildAssigneeFilterChip(),
           Expanded(child: _buildTaskList(visibleTasks)),
         ],
       ),
@@ -172,6 +183,23 @@ class _TaskListScreenState extends State<TaskListScreen> {
     );
   }
 
+  /// Shown only when the list is filtered by member. The x removes the filter
+  Widget _buildAssigneeFilterChip() {
+    final member = findMemberById(widget.members, _selectedAssigneeId);
+
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+        child: InputChip(
+          avatar: const Icon(Icons.person_outline, size: 18),
+          label: Text('Assigned to: ${member?.name ?? 'Unknown member'}'),
+          onDeleted: () => setState(() => _selectedAssigneeId = null),
+        ),
+      ),
+    );
+  }
+
   Widget _buildTaskList(List<Task> visibleTasks) {
     if (visibleTasks.isEmpty) {
       // Two different empty states: no tasks at all, or nothing matches
@@ -185,7 +213,13 @@ class _TaskListScreenState extends State<TaskListScreen> {
     }
 
     return ListView.builder(
-      padding: const EdgeInsets.all(AppSpacing.lg),
+      // extra space at the bottom so the New Task button never hides the last card
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.lg,
+        AppSpacing.sm,
+        AppSpacing.lg,
+        88,
+      ),
       itemCount: visibleTasks.length,
       itemBuilder: (context, index) {
         final task = visibleTasks[index];
@@ -198,7 +232,7 @@ class _TaskListScreenState extends State<TaskListScreen> {
           background: _buildDeleteBackground(context),
           // Ask first. Only a "true" answer lets the card slide away
           confirmDismiss: (direction) => confirmDeleteTask(context, task),
-          // this runs after the card has slid away; tell HomeShell to delete it
+          // this runs after the card has slid away; tell HomeShell to delete it.
           onDismissed: (direction) => widget.onDeleteTask(task),
           child: TaskCard(
             task: task,
