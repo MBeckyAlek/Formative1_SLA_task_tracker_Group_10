@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../models/team_member.dart';
+import '../models/team_member.dart';
 
 class MemberAvatar extends StatelessWidget {
   final TeamMember member;
