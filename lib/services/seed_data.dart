@@ -11,27 +11,27 @@ class SeedData {
   static List<TeamMember> get members => const [
     TeamMember(
       id: 'm1',
-      name: 'Alex Morgan',
+      name: 'Peniel Obang',
       role: 'Project Lead',
-      email: 'alex@example.com',
+      email: 'peniel@example.com',
     ),
     TeamMember(
       id: 'm2',
-      name: 'Sam Rivera',
+      name: 'Janna Bendou',
       role: 'Backend Developer',
-      email: 'sam@example.com',
+      email: 'janna@example.com',
     ),
     TeamMember(
       id: 'm3',
-      name: 'Jordan Lee',
+      name: 'Ariane Itetero',
       role: 'Frontend Developer',
-      email: 'jordan@example.com',
+      email: 'ariane@example.com',
     ),
     TeamMember(
       id: 'm4',
-      name: 'Taylor Kim',
+      name: 'Becky Alek',
       role: 'QA Engineer',
-      email: 'taylor@example.com',
+      email: 'becky@example.com',
     ),
   ];
 
