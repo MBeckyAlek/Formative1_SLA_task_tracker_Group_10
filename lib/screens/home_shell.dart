@@ -210,10 +210,6 @@ class _HomeShellState extends State<HomeShell> {
       );
     }
 
-    final listTasks = _memberFilterId == null
-        ? tasks
-        : tasks.where((t) => t.assigneeId == _memberFilterId).toList();
-
     return Scaffold(
       body: IndexedStack(
         index: _tabIndex,
@@ -227,9 +223,10 @@ class _HomeShellState extends State<HomeShell> {
           ),
           TaskListScreen(
             key: ValueKey('$_listFilter-$_memberFilterId'),
-            tasks: listTasks,
+            tasks: tasks,
             members: members,
             initialFilter: _listFilter,
+            initialAssigneeId: _memberFilterId,
             onOpenTask: openTask,
             onDeleteTask: deleteTask,
           ),
